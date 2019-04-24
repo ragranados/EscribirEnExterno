@@ -2,11 +2,22 @@ package com.naldana.ejemplo11
 
 import android.content.Context
 import android.os.Bundle
+import android.os.Environment
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
-import java.io.File
+import java.io.*
 
 class MainActivity : AppCompatActivity() {
+
+    private val isExternalStorageReadOnly: Boolean get() {
+        val extStorageState = Environment.getExternalStorageState()
+        return Environment.MEDIA_MOUNTED_READ_ONLY.equals(extStorageState)
+    }
+
+    private val isExternalStorageAvailable : Boolean get() {
+        val extStorageState = Environment.getExternalStorageState()
+        return Environment.MEDIA_MOUNTED.equals(extStorageState)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,16 +75,48 @@ class MainActivity : AppCompatActivity() {
 
         val archivoExterno = "externo.txt"
 
-        var externalFile : File
+        var externalFile : File? = null
 
         val filePath = "MyFileStorage"
+
+
 
         bt_write_external.setOnClickListener{
             val data = tv_data.text.toString()
 
-            externalFile = File(getExternalFilesDir())
+            externalFile = File(getExternalFilesDir(filePath),archivoExterno)
+
+            try{
+                val fileOutputStream = FileOutputStream(archivoExterno)
+                fileOutputStream.write(data.toByteArray())
+                fileOutputStream.close()
+            }catch (e: IOException){
+                e.printStackTrace()
+            }
+        }
+
+        bt_read_external.setOnClickListener{
+            externalFile = File(getExternalFilesDir(filePath), archivoExterno)
+
+            var fileInputStream = FileInputStream(externalFile)
+            var inputStreamReader = InputStreamReader(fileInputStream)
+            val bufferedReader = BufferedReader(inputStreamReader)
+            val stringBuilder = StringBuilder()
+            var text : String? = null
+
+            while ({text = bufferedReader.readLine(); text}()!= null){
+                stringBuilder.append(text)
+            }
+
+            fileInputStream.close()
+        }
+
+        if (!isExternalStorageAvailable || isExternalStorageReadOnly){
+            bt_save.isEnabled = false
         }
     }
+
+
 
 
 }

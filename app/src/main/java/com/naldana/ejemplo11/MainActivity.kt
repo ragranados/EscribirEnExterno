@@ -9,15 +9,7 @@ import java.io.*
 
 class MainActivity : AppCompatActivity() {
 
-    private val isExternalStorageReadOnly: Boolean get() {
-        val extStorageState = Environment.getExternalStorageState()
-        return Environment.MEDIA_MOUNTED_READ_ONLY.equals(extStorageState)
-    }
 
-    private val isExternalStorageAvailable : Boolean get() {
-        val extStorageState = Environment.getExternalStorageState()
-        return Environment.MEDIA_MOUNTED.equals(extStorageState)
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,9 +65,9 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        val archivoExterno = "externo.txt"
+        val nombreArchivo = "externo.txt"
 
-        var externalFile : File? = null
+        var externalFile: File?
 
         val filePath = "MyFileStorage"
 
@@ -84,10 +76,10 @@ class MainActivity : AppCompatActivity() {
         bt_write_external.setOnClickListener{
             val data = tv_data.text.toString()
 
-            externalFile = File(getExternalFilesDir(filePath),archivoExterno)
+            externalFile = File(getExternalFilesDir(filePath),nombreArchivo)
 
             try{
-                val fileOutputStream = FileOutputStream(archivoExterno)
+                val fileOutputStream = FileOutputStream(externalFile)
                 fileOutputStream.write(data.toByteArray())
                 fileOutputStream.close()
             }catch (e: IOException){
@@ -96,7 +88,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         bt_read_external.setOnClickListener{
-            externalFile = File(getExternalFilesDir(filePath), archivoExterno)
+            externalFile = File(getExternalFilesDir(filePath), nombreArchivo)
 
             var fileInputStream = FileInputStream(externalFile)
             var inputStreamReader = InputStreamReader(fileInputStream)
@@ -107,13 +99,23 @@ class MainActivity : AppCompatActivity() {
             while ({text = bufferedReader.readLine(); text}()!= null){
                 stringBuilder.append(text)
             }
-
+            tv_data.text = stringBuilder
             fileInputStream.close()
         }
 
         if (!isExternalStorageAvailable || isExternalStorageReadOnly){
             bt_save.isEnabled = false
         }
+    }
+
+    private val isExternalStorageReadOnly: Boolean get() {
+        val extStorageState = Environment.getExternalStorageState()
+        return Environment.MEDIA_MOUNTED_READ_ONLY.equals(extStorageState)
+    }
+
+    private val isExternalStorageAvailable : Boolean get() {
+        val extStorageState = Environment.getExternalStorageState()
+        return Environment.MEDIA_MOUNTED.equals(extStorageState)
     }
 
 

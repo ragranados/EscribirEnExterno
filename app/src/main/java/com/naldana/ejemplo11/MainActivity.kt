@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
+import java.io.File
 
 class MainActivity : AppCompatActivity() {
 
@@ -59,6 +60,18 @@ class MainActivity : AppCompatActivity() {
                 val text = it.bufferedReader().readText() // TODO (13) Se lee todo el contenido
                 tv_data.text = text
             }
+        }
+
+        val archivoExterno = "externo.txt"
+
+        var externalFile : File
+
+        val filePath = "MyFileStorage"
+
+        bt_write_external.setOnClickListener{
+            val data = tv_data.text.toString()
+
+            externalFile = File(getExternalFilesDir())
         }
     }
 
